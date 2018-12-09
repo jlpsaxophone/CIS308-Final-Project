@@ -5,6 +5,6 @@ typedef enum bool {FALSE, TRUE} bool;
 
 typedef struct Ship {
     int size;
-    ShipState state = afloat;
+    ShipState state;
     bool Segments[5];
 } Ship;

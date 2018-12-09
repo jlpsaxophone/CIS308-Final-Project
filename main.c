@@ -1,7 +1,4 @@
 //main.c
-
-
-
 //Board implementation
 
 #include "Board.h"
@@ -14,13 +11,10 @@
 
 typedef enum turn {human, cpu} turn;
 
-
-
-
+//Creates a blank board and fills it with all 0's
 Board * CreateBoard() {
     Board * b = malloc(sizeof(Board));
-    //int test;
-    //char c = ;
+
     for(int i = 0; i < 10; i++) {
         b->board[0][i] = i+'0';
     }
@@ -38,8 +32,7 @@ Board * CreateBoard() {
 }
 
 
-//core.c
-
+//Prints board to the console
 void PrintBoard(Board * b) {
         for(int i = 0; i < 11; i++) {
                 for(int j = 0; j < 11; j++) {
@@ -47,6 +40,61 @@ void PrintBoard(Board * b) {
                 }
                 printf("\n");
         }
+}
+
+
+//Method is called when it's the user's turn to guess
+void UserTurn(Board * enemyB) {
+	char * row;
+	int * col;
+
+	printf("Enter a row(A-J): ");
+	scanf("%s", row);
+	printf("Enter a column(1-9): ");
+	scanf("%d", col);
+	//call CheckBoard to see what is at the position that was guessed
+	//char guess = CheckBoard(enemyB, row, col);
+	//GuessResult(enemyB, guess);
+	//end turn, change to CPU's turn here or in main method?
+}
+
+//Checks the place that the player guessed on the board
+char CheckBoard(Board * enemyB, char row, int col) {
+	char guess;
+	char c = col + '0';
+	if (enemyB->board[row][c] != '0') {
+		guess = 'R';
+		return guess;
+	}
+	else if (enemyB->board[row][c] == 'S') {
+		enemyB->board[row][c] = 'X';
+		guess = 'X';
+		return guess;
+	}
+	else {
+		enemyB->board[row][c] = '1';
+		guess = '1';
+		return guess;
+	}
+}
+
+void GuessResult(Board * enemyB, char guess) {
+	//reprint board here?
+	PrintBoard(enemyB);
+	if (guess = 'R') {
+		printf("\n You have already guess there! Try Again! \n");
+		//call turn method again
+	}
+	else if (guess = '1') {
+		printf("\n You missed! \n");
+	}
+	else if (guess = 'X') {
+		printf("\n You hit a ship! \n");
+	}
+	else {
+		printf("\n Something went wrong \n");
+		//just for testing purposes
+	}
 }
 
 int main(int argc, const char * argv[]) {
@@ -73,18 +121,16 @@ int main(int argc, const char * argv[]) {
     SubHuman->size = 5;
     Ship * CarrierCPU = malloc(sizeof(Ship));
     SubCPU->size = 5;
-    //all ships sizes are 5, check size before dealing with ship segments 
+    //all ships sizes are 5, check size before dealing with ship segments
     int HumanShipCounter = 5;
     int CPUShipCounter = 5;
     //place ships using method
-    
 
 
 
 
-    //free everything at very end of program    
+    //free everything at very end of program
     return 1;
-    
 }
 
 

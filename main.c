@@ -83,7 +83,7 @@ void GuessResult(Board * enemyB, char guess) {
 	//reprint board here?
 	PrintBoard(enemyB);
 	if (guess = 'R') {
-		printf("\n You have already guess there! Try Again! \n");
+		printf("\n You have already guessed there! Try Again! \n");
 		//call turn method again
 	}
 	else if (guess = '1') {
@@ -101,12 +101,12 @@ void GuessResult(Board * enemyB, char guess) {
 int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
     if(d == horizontal) {
                 for(int i = 0; i < s->size; i++) {
-                        if(b->board[starty][startx + i] != '0') {return 0;}
+                        if(b->board[startx + i][starty] != '0') {return 0;}
                 }
         }
         else {
                 for(int i = 0; i < s->size; i++) {
-                        if(b->board[starty + i][startx] != '0') {return 0;}
+                        if(b->board[startx][starty + i] != '0') {return 0;}
                 }
     }
         return 1;
@@ -114,19 +114,29 @@ int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
 
 ShipPosition * FindSpot(Board * b, Ship * s) {
         ShipPosition * sp = malloc(sizeof(ShipPosition));
-        int determiner = (rand() % 1);
+	srand(time(NULL));
+        int determiner = rand() % 2;
+	printf("%d\n", determiner);
         if(determiner == 0) {sp->d = horizontal;}
         else if(determiner == 1) {sp->d = vertical;}
 
-        int maxpoint = (9 - s->size);
+        int maxpoint = (10 - s->size);
 
         if((sp->d) == 0) {
-                sp->xcoordinate = (rand() % maxpoint);
-                sp->ycoordinate = (rand() % 9);
+                srand(time(NULL));
+		sp->xcoordinate = (rand() % maxpoint);
+		printf("%d\n", sp->xcoordinate);
+                srand(time(NULL));
+		sp->ycoordinate = (rand() % 10);
+		printf("%d\n", sp->ycoordinate);
         }
         else {
-                sp->xcoordinate = (rand() % 9);
+		srand(time(NULL));
+                sp->xcoordinate = (rand() % 10);
+		printf("%d\n", sp->xcoordinate);
+		srand(time(NULL));
                 sp->ycoordinate = (rand() % maxpoint);
+		printf("%d\n", sp->ycoordinate);
         }
         return sp;
 }
@@ -134,20 +144,21 @@ ShipPosition * FindSpot(Board * b, Ship * s) {
 void PlaceShip(Board * b, Ship * s, char representer) {
         ShipPosition * sp = FindSpot(b, s);
         //checks for safety
-        while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 0) {
-                ShipPosition * sp = FindSpot(b, s);
-        }
+       // while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 1) {
+         //       ShipPosition * sp = FindSpot(b, s);
+       // }
         //places on board
         if(sp->d == 0) {
                 for(int i = 0; i < s->size; i++) {
-                        b->board[sp->ycoordinate][sp->xcoordinate + i] = representer;
+                        b->board[sp->xcoordinate + i][sp->ycoordinate] = representer;
                 }
         }
         else {
                 for(int i = 0; i < s->size; i++) {
-                        b->board[sp->ycoordinate + i][sp->xcoordinate] = representer;
+                        b->board[sp->xcoordinate][sp->ycoordinate + i] = representer;
                 }
         }
+	free(sp);
 }
 
 int main(int argc, const char * argv[]) {
@@ -157,37 +168,38 @@ int main(int argc, const char * argv[]) {
     Ship * DestroyerHuman = malloc(sizeof(Ship));
     DestroyerHuman->size = 2;
     Ship * DestroyerCPU = malloc(sizeof(Ship));
-    DestroyerHuman->size = 2;
+    DestroyerCPU->size = 2;
     Ship * SubHuman = malloc(sizeof(Ship));
     SubHuman->size = 3;
     Ship * SubCPU = malloc(sizeof(Ship));
     SubCPU->size = 3;
     Ship * CruiserHuman = malloc(sizeof(Ship));
-    SubHuman->size = 3;
+    CruiserHuman->size = 3;
     Ship * CruiserCPU = malloc(sizeof(Ship));
-    SubCPU->size = 3;
+    CruiserCPU->size = 3;
     Ship * BattleshipHuman = malloc(sizeof(Ship));
-    SubHuman->size = 4;
+    BattleshipHuman->size = 4;
     Ship * BattleshipCPU = malloc(sizeof(Ship));
-    SubCPU->size = 4;
+    BattleshipCPU->size = 4;
     Ship * CarrierHuman = malloc(sizeof(Ship));
-    SubHuman->size = 5;
+    CarrierHuman->size = 5;
     Ship * CarrierCPU = malloc(sizeof(Ship));
-    SubCPU->size = 5;
+    CarrierCPU->size = 5;
     //all ships sizes are 5, check size before dealing with ship segments
     int HumanShipCounter = 5;
     int CPUShipCounter = 5;
     //place ships using method
     PlaceShip(PlayerBoard, DestroyerHuman, 'S');
+    //printf("\nShip printed\n");
     PlaceShip(PlayerBoard, SubHuman, 'S');
-    PlaceShip(PlayerBoard, CruiserHuman, 'S');
-    PlaceShip(PlayerBoard, BattleshipHuman, 'S');
-    PlaceShip(PlayerBoard, CarrierHuman, 'S');
+    //PlaceShip(PlayerBoard, CruiserHuman, 'S');
+    //PlaceShip(PlayerBoard, BattleshipHuman, 'S');
+    /*PlaceShip(PlayerBoard, CarrierHuman, 'S');
     PlaceShip(CPUBoard, DestroyerCPU, 'S');
     PlaceShip(CPUBoard, SubCPU, 'S');
     PlaceShip(CPUBoard, CruiserCPU, 'S');
     PlaceShip(CPUBoard, BattleshipCPU, 'S');
-    PlaceShip(CPUBoard, CarrierCPU, 'S');
+    PlaceShip(CPUBoard, CarrierCPU, 'S');*/
     PrintBoard(PlayerBoard);
 
 

@@ -98,6 +98,58 @@ void GuessResult(Board * enemyB, char guess) {
 	}
 }
 
+int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
+    if(d == horizontal) {
+                for(int i = 0; i < s->size; i++) {
+                        if(b->board[starty][startx + i] != '0') {return 0;}
+                }
+        }
+        else {
+                for(int i = 0; i < s->size; i++) {
+                        if(b->board[starty + i][startx] != '0') {return 0;}
+                }
+    }
+        return 1;
+}
+
+ShipPosition * FindSpot(Board * b, Ship * s) {
+        ShipPosition * sp = malloc(sizeof(ShipPosition));
+        int determiner = (rand() % 1);
+        if(determiner == 0) {sp->d = horizontal;}
+        else if(determiner == 1) {sp->d = vertical;}
+
+        int maxpoint = (9 - s->size);
+
+        if((sp->d) == 0) {
+                sp->xcoordinate = (rand() % maxpoint);
+                sp->ycoordinate = (rand() % 9);
+        }
+        else {
+                sp->xcoordinate = (rand() % 9);
+                sp->ycoordinate = (rand() % maxpoint);
+        }
+        return sp;
+}
+
+void PlaceShip(Board * b, Ship * s, char representer) {
+        ShipPosition * sp = FindSpot(b, s);
+        //checks for safety
+        while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 0) {
+                ShipPosition * sp = FindSpot(b, s);
+        }
+        //places on board
+        if(sp->d == 0) {
+                for(int i = 0; i < s->size; i++) {
+                        b->board[sp->ycoordinate][sp->xcoordinate + i] = representer;
+                }
+        }
+        else {
+                for(int i = 0; i < s->size; i++) {
+                        b->board[sp->ycoordinate + i][sp->xcoordinate] = representer;
+                }
+        }
+}
+
 int main(int argc, const char * argv[]) {
     Board * PlayerBoard = CreateBoard();
     Board * CPUBoard = CreateBoard();
@@ -136,7 +188,7 @@ int main(int argc, const char * argv[]) {
     PlaceShip(CPUBoard, CruiserCPU, 'S');
     PlaceShip(CPUBoard, BattleshipCPU, 'S');
     PlaceShip(CPUBoard, CarrierCPU, 'S');
-
+    PrintBoard(PlayerBoard);
 
 
 
@@ -145,61 +197,6 @@ int main(int argc, const char * argv[]) {
     return 1;
 }
 
-
-
-//everything below this is random board placement
-
-int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
-    if(d == horizontal) {
-		for(int i = 0; i < s->size; i++) {
-			if(b->board[starty][startx + i] != '0') {return 0;}
-		}
-	}
-	else {
-		for(int i = 0; i < s->size; i++) {
-			if(b->board[starty + i][startx] != '0') {return 0;}
-		}
-    }
-	return 1;
-}
-
-ShipPosition FindSpot(Board * b, Ship * s) {
-	ShipPosition sp = malloc(sizeof(ShipPosition));
-	int determiner = (rand() % 1;
-	if(determiner == 0) {sp->d = horizontal;}
-	else if(determiner == 1) {sp->d = vertical;}
-	
-	int maxpoint = (9 - Ship->size);
-
-	if(sp->direction == 0) {
-		sp->xcoordinate = (rand() % maxpoint);
-		sp->ycoordinate = (rand() % 9);
-	}
-	else {
-		sp->xcoordinate = (rand() % 9);
-		sp->ycoordinate = (rand() % maxpoint);
-	}
-	return sp;	
-}
-
-void PlaceShip(Board * b, Ship * s, char representer) {
-	ShipPosition sp = FindSpot(b, s);
-	//checks for safety
-	while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 0) {
-		ShipPosition sp = FindSpot(b, s);
-	}	
-	//places on board	
-	if(sp->direction == 0) {
-		for(int i = 0; i < s->size; i++) {
-			board[sp->ycoordinate][sp->xcoordinate + i] = representer;
-		}
-	}
-	else {
-		for(int i = 0; i < s->size; i++) {
-			board[sp->ycoordinate + i][sp->xcoordinate] = representer;
-		}
-	}
-}
 
 
 

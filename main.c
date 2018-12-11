@@ -15,14 +15,14 @@ typedef enum turn {human, cpu} turn;
 //Creates a blank board and fills it with all 0's
 Board * CreateBoard() {
     Board * b = malloc(sizeof(Board));
-
-    for(int i = 0; i < 10; i++) {
-        b->board[0][i] = i+'0';
+    char c = 'A';
+    for(int i = 1; i < 10; i++) {
+        b->board[0][i] = c;
+	c++;
     }
-    char c2 = 'A';
-    for(int j = 1; j < 10; j++) {
-        b->board[j][0] = c2;
-        c2++;
+   
+    for(int j = 0; j < 10; j++) {
+        b->board[j][0] = j + '0';
     }
     for(int k = 1; k < 10; k++) {
         for(int l = 1; l < 10; l++) {
@@ -37,7 +37,7 @@ Board * CreateBoard() {
 void PrintBoard(Board * b) {
         for(int i = 0; i < 11; i++) {
                 for(int j = 0; j < 11; j++) {
-                        printf("%c", b->board[i][j]);
+                        printf("%c", b->board[j][i]);
                 }
                 printf("\n");
         }
@@ -106,7 +106,7 @@ int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
         }
         else {
                 for(int i = 0; i < s->size; i++) {
-                        if(b->board[startx][starty + i] != '0') {return 0;}
+                        if(b->board[startx][starty+ i] != '0') {return 0;}
                 }
     }
         return 1;
@@ -116,35 +116,35 @@ ShipPosition * FindSpot(Board * b, Ship * s) {
         ShipPosition * sp = malloc(sizeof(ShipPosition));
 	srand(time(NULL));
         int determiner = rand() % 2;
-	printf("%d\n", determiner);
+	//printf("%d\n", determiner);
         if(determiner == 0) {sp->d = horizontal;}
         else if(determiner == 1) {sp->d = vertical;}
 
-        int maxpoint = (10 - s->size);
+        int maxpoint = (9 - s->size);
 
         if((sp->d) == horizontal) {
                 srand(time(NULL));
-		sp->xcoordinate = (rand() % maxpoint);
+		sp->xcoordinate = rand() % (maxpoint - 1 + 1) + 1;
                 srand(time(NULL));
-		sp->ycoordinate = (rand() % 10);
+		sp->ycoordinate = rand() % (9 - 1 + 1) + 1;
         }
         else if(sp->d == vertical) {
 		srand(time(NULL));
-                sp->xcoordinate = (rand() % 10);
+                sp->xcoordinate = rand() % (9 - 1 + 1) + 1;
 		srand(time(NULL));
-                sp->ycoordinate = (rand() % maxpoint);
+                sp->ycoordinate = rand() % (maxpoint- 1 + 1) + 1;
         }
-	printf("%d\n", sp->xcoordinate);
-	printf("%d\n", sp->ycoordinate);
+	//printf("%d\n", sp->xcoordinate);
+	//printf("%d\n", sp->ycoordinate);
         return sp;
 }
 
 void PlaceShip(Board * b, Ship * s, char representer) {
         ShipPosition * sp = FindSpot(b, s);
         //checks for safety
-       // while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 1) {
-         //       ShipPosition * sp = FindSpot(b, s);
-       // }
+        while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 1) {
+               ShipPosition * sp = FindSpot(b, s);
+         }
         //places on board
         if(sp->d == 0) {
                 for(int i = 0; i < s->size; i++) {
@@ -187,6 +187,7 @@ int main(int argc, const char * argv[]) {
     int HumanShipCounter = 5;
     int CPUShipCounter = 5;
     //place ships using method
+    printf("%d\n", PlayerBoard->board[0][3]);
     PlaceShip(PlayerBoard, DestroyerHuman, 'S');
     //printf("\nShip printed\n");
     PlaceShip(PlayerBoard, SubHuman, 'S');

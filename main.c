@@ -122,22 +122,20 @@ ShipPosition * FindSpot(Board * b, Ship * s) {
 
         int maxpoint = (10 - s->size);
 
-        if((sp->d) == 0) {
+        if((sp->d) == horizontal) {
                 srand(time(NULL));
 		sp->xcoordinate = (rand() % maxpoint);
-		printf("%d\n", sp->xcoordinate);
                 srand(time(NULL));
 		sp->ycoordinate = (rand() % 10);
-		printf("%d\n", sp->ycoordinate);
         }
-        else {
+        else if(sp->d == vertical) {
 		srand(time(NULL));
                 sp->xcoordinate = (rand() % 10);
-		printf("%d\n", sp->xcoordinate);
 		srand(time(NULL));
                 sp->ycoordinate = (rand() % maxpoint);
-		printf("%d\n", sp->ycoordinate);
         }
+	printf("%d\n", sp->xcoordinate);
+	printf("%d\n", sp->ycoordinate);
         return sp;
 }
 

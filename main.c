@@ -114,28 +114,20 @@ int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
 
 ShipPosition * FindSpot(Board * b, Ship * s) {
         ShipPosition * sp = malloc(sizeof(ShipPosition));
-	srand(time(NULL));
         int determiner = rand() % 2;
-	//printf("%d\n", determiner);
         if(determiner == 0) {sp->d = horizontal;}
         else if(determiner == 1) {sp->d = vertical;}
 
         int maxpoint = (9 - s->size);
 
         if((sp->d) == horizontal) {
-                srand(time(NULL));
 		sp->xcoordinate = rand() % (maxpoint - 1 + 1) + 1;
-                srand(time(NULL));
 		sp->ycoordinate = rand() % (9 - 1 + 1) + 1;
         }
         else if(sp->d == vertical) {
-		srand(time(NULL));
                 sp->xcoordinate = rand() % (9 - 1 + 1) + 1;
-		srand(time(NULL));
                 sp->ycoordinate = rand() % (maxpoint- 1 + 1) + 1;
         }
-	//printf("%d\n", sp->xcoordinate);
-	//printf("%d\n", sp->ycoordinate);
         return sp;
 }
 
@@ -143,7 +135,8 @@ void PlaceShip(Board * b, Ship * s, char representer) {
         ShipPosition * sp = FindSpot(b, s);
         //checks for safety
         while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 1) {
-               ShipPosition * sp = FindSpot(b, s);
+		free(sp);               
+		ShipPosition * sp = FindSpot(b, s);
          }
         //places on board
         if(sp->d == 0) {
@@ -160,6 +153,7 @@ void PlaceShip(Board * b, Ship * s, char representer) {
 }
 
 int main(int argc, const char * argv[]) {
+    srand(time(NULL));
     Board * PlayerBoard = CreateBoard();
     Board * CPUBoard = CreateBoard();
     Board * CPUViewBoard = CreateBoard();
@@ -186,23 +180,18 @@ int main(int argc, const char * argv[]) {
     //all ships sizes are 5, check size before dealing with ship segments
     int HumanShipCounter = 5;
     int CPUShipCounter = 5;
-    //place ships using method
     printf("%d\n", PlayerBoard->board[0][3]);
     PlaceShip(PlayerBoard, DestroyerHuman, 'S');
-    //printf("\nShip printed\n");
     PlaceShip(PlayerBoard, SubHuman, 'S');
-    //PlaceShip(PlayerBoard, CruiserHuman, 'S');
-    //PlaceShip(PlayerBoard, BattleshipHuman, 'S');
-    /*PlaceShip(PlayerBoard, CarrierHuman, 'S');
-    PlaceShip(CPUBoard, DestroyerCPU, 'S');
+    PlaceShip(PlayerBoard, CruiserHuman, 'S');
+    PlaceShip(PlayerBoard, BattleshipHuman, 'S');
+    PlaceShip(PlayerBoard, CarrierHuman, 'S');
+    /*PlaceShip(CPUBoard, DestroyerCPU, 'S');
     PlaceShip(CPUBoard, SubCPU, 'S');
     PlaceShip(CPUBoard, CruiserCPU, 'S');
     PlaceShip(CPUBoard, BattleshipCPU, 'S');
     PlaceShip(CPUBoard, CarrierCPU, 'S');*/
     PrintBoard(PlayerBoard);
-
-
-
 
     //free everything at very end of program
     return 1;

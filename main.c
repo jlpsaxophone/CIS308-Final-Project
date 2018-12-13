@@ -43,37 +43,26 @@ void PrintBoard(Board * b) {
         }
 }
 
-
-//Method is called when it's the user's turn to guess
-void UserTurn(Board * enemyB) {
-	char * row;
-	int * col;
-
-	printf("Enter a row(A-J): ");
-	scanf("%s", row);
-	printf("Enter a column(1-9): ");
-	scanf("%d", col);
-	//call CheckBoard to see what is at the position that was guessed
-	//char guess = CheckBoard(enemyB, row, col);
-	//GuessResult(enemyB, guess);
-	//end turn, change to CPU's turn here or in main method?
-}
-
 //Checks the place that the player guessed on the board
-char CheckBoard(Board * enemyB, char row, int col) {
+char CheckBoard(Board * enemyB, Board * enemyvb, char row, int col) {
 	char guess;
-	char c = col + '0';
-	if (enemyB->board[row][c] != '0') {
+	int r = row + '0';
+	//printf("%d", enemyvb->board[r+1][col]);
+	/*if ((enemyvb->board[r][col]) != 48) {
 		guess = 'R';
 		return guess;
-	}
-	else if (enemyB->board[row][c] == 'S') {
-		enemyB->board[row][c] = 'X';
+	}*/
+	printf("%s", enemyB->board[r+1][col+1]);
+	printf("%s", enemyB->board[r][col+1]);
+	printf("%s", enemyB->board[r+2][col]);
+	printf("%s", enemyB->board[r-1][col]);
+	if (enemyB->board[r+1][col] == 'S') {
+		enemyB->board[r+1][col] = 'X';
 		guess = 'X';
 		return guess;
 	}
-	else {
-		enemyB->board[row][c] = '1';
+	else if(enemyB->board[r+1][col] == '1'){
+		enemyB->board[r+1][col] = '1';
 		guess = '1';
 		return guess;
 	}
@@ -81,15 +70,15 @@ char CheckBoard(Board * enemyB, char row, int col) {
 
 void GuessResult(Board * enemyB, char guess) {
 	//reprint board here?
-	PrintBoard(enemyB);
-	if (guess = 'R') {
+	//PrintBoard(enemyB);
+	if (guess == 'R') {
 		printf("\n You have already guessed there! Try Again! \n");
 		//call turn method again
 	}
-	else if (guess = '1') {
+	else if (guess == '1') {
 		printf("\n You missed! \n");
 	}
-	else if (guess = 'X') {
+	else if (guess == 'X') {
 		printf("\n You hit a ship! \n");
 	}
 	else {
@@ -97,6 +86,22 @@ void GuessResult(Board * enemyB, char guess) {
 		//just for testing purposes
 	}
 }
+
+//Method is called when it's the user's turn to guess
+void UserTurn(Board * enemyB, Board * enemyvb) {
+        char * row;
+        int col;
+	PrintBoard(enemyB);
+        printf("Enter a row(A-J): ");
+        scanf("%s", row);
+        printf("Enter a column(1-9): ");
+        scanf("%d", &col);
+        //call CheckBoard to see what is at the position that was guessed
+        char guess = CheckBoard(enemyB, enemyvb, *row, col);
+        GuessResult(enemyB, guess);
+        //end turn, change to CPU's turn here or in main method?
+}
+
 
 int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
     if(d == horizontal) {
@@ -180,18 +185,26 @@ int main(int argc, const char * argv[]) {
     //all ships sizes are 5, check size before dealing with ship segments
     int HumanShipCounter = 5;
     int CPUShipCounter = 5;
-    printf("%d\n", PlayerBoard->board[0][3]);
     PlaceShip(PlayerBoard, DestroyerHuman, 'S');
     PlaceShip(PlayerBoard, SubHuman, 'S');
     PlaceShip(PlayerBoard, CruiserHuman, 'S');
     PlaceShip(PlayerBoard, BattleshipHuman, 'S');
     PlaceShip(PlayerBoard, CarrierHuman, 'S');
-    /*PlaceShip(CPUBoard, DestroyerCPU, 'S');
+    PlaceShip(CPUBoard, DestroyerCPU, 'S');
     PlaceShip(CPUBoard, SubCPU, 'S');
     PlaceShip(CPUBoard, CruiserCPU, 'S');
     PlaceShip(CPUBoard, BattleshipCPU, 'S');
-    PlaceShip(CPUBoard, CarrierCPU, 'S');*/
+    PlaceShip(CPUBoard, CarrierCPU, 'S');
+    //PrintBoard(PlayerBoard);
+    
+    //start turn loop
+    printf("Enemy Board:\n\n");
+    PrintBoard(CPUViewBoard);
+    printf("\nYour Board:\n\n");
     PrintBoard(PlayerBoard);
+    UserTurn(CPUBoard, CPUViewBoard);
+
+
 
     //free everything at very end of program
     return 1;

@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef enum turn {human, cpu} turn;
+typedef enum turn {human, cpu, gameOver} turn;
 
 //Creates a blank board and fills it with all 0's
 Board * CreateBoard() {
@@ -20,7 +20,7 @@ Board * CreateBoard() {
         b->board[0][i] = c;
 	c++;
     }
-   
+
     for(int j = 0; j < 10; j++) {
         b->board[j][0] = j + '0';
     }
@@ -46,34 +46,32 @@ void PrintBoard(Board * b) {
 //Checks the place that the player guessed on the board
 char CheckBoard(Board * enemyB, Board * enemyvb, char row, int col) {
 	char guess;
-	int r = row + '0';
-	//printf("%d", enemyvb->board[r+1][col]);
-	/*if ((enemyvb->board[r][col]) != 48) {
+	int r = row - 64;
+	printf("%d", r);
+	printf("%d", enemyB->board[col][r]);
+	if ((enemyvb->board[col][r]) != '0') {
 		guess = 'R';
 		return guess;
-	}*/
-	printf("%s", enemyB->board[r+1][col+1]);
-	printf("%s", enemyB->board[r][col+1]);
-	printf("%s", enemyB->board[r+2][col]);
-	printf("%s", enemyB->board[r-1][col]);
-	if (enemyB->board[r+1][col] == 'S') {
-		enemyB->board[r+1][col] = 'X';
+	}
+	else if (enemyB->board[col][r] == 'S') {
+		enemyB->board[col][r] = 'X';
+		enemyvb->board[col][r] = 'X';
 		guess = 'X';
 		return guess;
 	}
-	else if(enemyB->board[r+1][col] == '1'){
-		enemyB->board[r+1][col] = '1';
+	else if(enemyB->board[col][r] == '0'){
+		enemyB->board[col][r] = '1';
+		enemyvb->board[col][r] = '1';
 		guess = '1';
 		return guess;
 	}
 }
 
-void GuessResult(Board * enemyB, char guess) {
+void GuessResult(Board * enemyB, Board * enemyvb, char guess) {
 	//reprint board here?
 	//PrintBoard(enemyB);
 	if (guess == 'R') {
-		printf("\n You have already guessed there! Try Again! \n");
-		//call turn method again
+		printf("\n You have already guessed there! \n");
 	}
 	else if (guess == '1') {
 		printf("\n You missed! \n");
@@ -98,10 +96,27 @@ void UserTurn(Board * enemyB, Board * enemyvb) {
         scanf("%d", &col);
         //call CheckBoard to see what is at the position that was guessed
         char guess = CheckBoard(enemyB, enemyvb, *row, col);
-        GuessResult(enemyB, guess);
+        GuessResult(enemyB, enemyvb, guess);
         //end turn, change to CPU's turn here or in main method?
 }
 
+//Checks the place that the computer guessed on the board
+void CPUTurn(Board * userB) {
+	int row = rand() % (9) + 1;
+        int col = rand() % (9) + 1;
+        if (userB->board[col][row] == 'S') {
+                userB->board[col][row] = 'X';
+                printf("The computer hit your ship!");
+        }
+        else if(userB->board[col][row] == '0'){
+                userB->board[col][row] = '1';
+                printf("The computer missed!");
+        }
+	else if ((userB->board[col][row]) != '0') {
+                CPUTurn(userB);
+        }
+
+}
 
 int IsSafe(direction d, Board * b, Ship * s, int startx, int starty) {
     if(d == horizontal) {
@@ -140,7 +155,7 @@ void PlaceShip(Board * b, Ship * s, char representer) {
         ShipPosition * sp = FindSpot(b, s);
         //checks for safety
         while((IsSafe(sp->d, b, s, sp->xcoordinate, sp->ycoordinate)) != 1) {
-		free(sp);               
+		free(sp);
 		ShipPosition * sp = FindSpot(b, s);
          }
         //places on board
@@ -155,6 +170,17 @@ void PlaceShip(Board * b, Ship * s, char representer) {
                 }
         }
 	free(sp);
+}
+
+int CheckWin(Board * b) {
+	for(int i = 0; i < 11; i++) {
+		for(int j = 0; j < 11; j++) {
+			if (b->board[j][i] == 'S') {
+				return 0;
+			}
+		}
+	}
+	return 1;
 }
 
 int main(int argc, const char * argv[]) {
@@ -182,9 +208,7 @@ int main(int argc, const char * argv[]) {
     CarrierHuman->size = 5;
     Ship * CarrierCPU = malloc(sizeof(Ship));
     CarrierCPU->size = 5;
-    //all ships sizes are 5, check size before dealing with ship segments
-    int HumanShipCounter = 5;
-    int CPUShipCounter = 5;
+
     PlaceShip(PlayerBoard, DestroyerHuman, 'S');
     PlaceShip(PlayerBoard, SubHuman, 'S');
     PlaceShip(PlayerBoard, CruiserHuman, 'S');
@@ -195,15 +219,39 @@ int main(int argc, const char * argv[]) {
     PlaceShip(CPUBoard, CruiserCPU, 'S');
     PlaceShip(CPUBoard, BattleshipCPU, 'S');
     PlaceShip(CPUBoard, CarrierCPU, 'S');
-    //PrintBoard(PlayerBoard);
-    
-    //start turn loop
-    printf("Enemy Board:\n\n");
-    PrintBoard(CPUViewBoard);
-    printf("\nYour Board:\n\n");
-    PrintBoard(PlayerBoard);
-    UserTurn(CPUBoard, CPUViewBoard);
 
+	turn t = human;
+
+	//start turn loop while != gameOver
+	while(t != gameOver) {
+	//for(int i = 0; i < 10; i++) {
+		if(t == human) {
+			//player's turn
+			printf("Enemy Board:\n\n");
+			PrintBoard(CPUViewBoard);
+			printf("\nYour Board:\n\n");
+			PrintBoard(PlayerBoard);
+			UserTurn(CPUBoard, CPUViewBoard);
+			if (CheckWin(CPUBoard) == 1) {
+				printf("You won!");
+				t = gameOver;
+			}
+			else {
+				t = cpu;
+			}
+		}
+		if (t == cpu) {
+			//CPU's turn
+			CPUTurn(PlayerBoard);
+			if (CheckWin(PlayerBoard) == 1) {
+				printf("You lost.");
+				t = gameOver;
+			}
+			else {
+				t = human;
+			}
+		}
+	}
 
 
     //free everything at very end of program
